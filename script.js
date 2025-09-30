@@ -1,4 +1,4 @@
-// --- Constants and Initial Setup ---
+// --- Elements ---
 const form = document.getElementById("checkInForm");
 const nameInput = document.getElementById("attendeeName");
 const teamSelect = document.getElementById("teamSelect");
@@ -7,14 +7,16 @@ const progressBar = document.getElementById("progressBar");
 const welcomeMessage = document.getElementById("welcomeMessage");
 const celebrationMessage = document.getElementById("celebrationMessage");
 const attendeeList = document.getElementById("attendeeList");
+
 const teamCounters = {
   WaterWise: document.getElementById("WaterWiseCount"),
   NetZero: document.getElementById("NetZeroCount"),
   Renewables: document.getElementById("RenewablesCount")
 };
+
 const maxCount = 50;
 
-// --- Load State from localStorage or initialize ---
+// --- State (load from localStorage) ---
 let count = Number(localStorage.getItem("totalCount")) || 0;
 let teamCounts = JSON.parse(localStorage.getItem("teamCounts")) || {
   WaterWise: 0,
@@ -25,17 +27,19 @@ let attendees = JSON.parse(localStorage.getItem("attendees")) || [];
 
 // --- Functions ---
 function updateDisplays() {
-  // Update total count
+  // Total count
   totalCountDisplay.textContent = count;
-  // Update team counts
+
+  // Team counts
   for (const team in teamCounts) {
     teamCounters[team].textContent = teamCounts[team];
   }
-  // Update progress bar
+
+  // Progress bar
   const percent = Math.min(Math.round((count / maxCount) * 100), 100) + "%";
   progressBar.style.width = percent;
-  progressBar.setAttribute("aria-valuenow", count);
   progressBar.textContent = percent;
+
   // Attendee list
   renderAttendeeList();
 }
@@ -43,9 +47,9 @@ function updateDisplays() {
 function renderAttendeeList() {
   attendeeList.innerHTML = "";
   attendees.forEach(({ name, team }) => {
-    const item = document.createElement("li");
-    item.textContent = `${name} (${team.replace(/([A-Z])/g, " $1").trim()})`;
-    attendeeList.appendChild(item);
+    const li = document.createElement("li");
+    li.textContent = `${name} (${team})`;
+    attendeeList.appendChild(li);
   });
 }
 
@@ -55,11 +59,9 @@ function saveState() {
   localStorage.setItem("attendees", JSON.stringify(attendees));
 }
 
-function displayGreeting(name, teamName) {
-  welcomeMessage.textContent = `🎉 Welcome, ${name} from ${teamName}!`;
-  setTimeout(() => {
-    welcomeMessage.textContent = "";
-  }, 3000);
+function displayGreeting(name, team) {
+  welcomeMessage.textContent = `🎉 Welcome, ${name} from ${team}!`;
+  setTimeout(() => (welcomeMessage.textContent = ""), 3000);
 }
 
 function checkCelebration() {
@@ -73,39 +75,36 @@ function checkCelebration() {
         winningTeam = team;
       }
     }
-    if (winningTeam) {
-      celebrationMessage.innerHTML = `🏆 Attendance Goal Reached!<br>Congratulations, <strong>${winningTeam.replace(/([A-Z])/g, " $1").trim()}</strong> team!`;
-    }
+    celebrationMessage.innerHTML = `🏆 Attendance Goal Reached!<br>
+      Congratulations, <strong>${winningTeam}</strong> team!`;
   } else {
-    celebrationMessage.innerHTML = "";
+    celebrationMessage.textContent = "";
   }
 }
 
-// --- Form Submission Handler ---
-form.addEventListener("submit", function (event) {
-  event.preventDefault();
+// --- Form Handler ---
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
   const name = nameInput.value.trim();
   const team = teamSelect.value;
-  const teamName = teamSelect.selectedOptions[0].text;
 
-  if (!name) return; // Ignore empty names
+  if (!name || !team) return;
 
-  // Update counts
+  // Update state
   count++;
   teamCounts[team]++;
-  attendees.push({ name, team: team });
+  attendees.push({ name, team });
 
-  // Save to localStorage
+  // Save + Update
   saveState();
-
-  // Update UI
   updateDisplays();
-  displayGreeting(name, teamName);
+  displayGreeting(name, team);
   checkCelebration();
 
   form.reset();
 });
 
-// --- Initial UI Population ---
+// --- Init ---
 updateDisplays();
 checkCelebration();
+
