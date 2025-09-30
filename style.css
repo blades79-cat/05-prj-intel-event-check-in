@@ -13,7 +13,7 @@ body {
   min-height: 100vh;
 }
 
-/* Add form label styling */
+/* Form labels */
 .form-label {
   display: block;
   text-align: left;
@@ -123,6 +123,19 @@ input:focus {
   box-shadow: 0 0 0 4px rgba(0, 113, 197, 0.15);
 }
 
+select {
+  padding: 16px;
+  border: 2px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: 500;
+  background: white;
+  color: #2c3e50;
+  cursor: pointer;
+  min-width: 140px;
+}
+
+/* Button */
 button {
   background-color: #0071c5;
   color: white;
@@ -147,22 +160,12 @@ button:hover {
   box-shadow: 0 6px 15px rgba(0, 113, 197, 0.3);
 }
 
-/* Icon spacing */
-.fas {
-  margin-right: 8px;
-}
-
 button .fas {
   font-size: 18px;
   margin-right: 10px;
 }
 
-.attendance-header i {
-  font-size: 22px;
-  margin-right: 8px;
-}
-
-/* Attendance section spacing */
+/* Attendance header */
 .attendance-header {
   display: flex;
   align-items: center;
@@ -173,26 +176,7 @@ button .fas {
   color: #64748b;
 }
 
-/* Attendance tracker styling */
-.attendance-tracker {
-  max-width: 700px;
-  width: 90%;
-  margin: 0 auto 40px;
-  padding: 0 20px;
-  text-align: center;
-}
-
-.attendance-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  margin-bottom: 15px;
-  font-size: 17px;
-  color: #64748b;
-}
-
-#attendeeCount {
+#totalCount {
   color: #0071c5;
   font-size: 24px;
   font-weight: 700;
@@ -202,16 +186,9 @@ button .fas {
 .attendance-header i {
   color: #0071c5;
   font-size: 20px;
-  margin-right: 4px;
 }
 
-/* Max attendees text */
-.attendance-header span:last-child {
-  color: #64748b;
-  font-size: 17px;
-}
-
-/* Progress container - simplified */
+/* Progress bar */
 .progress-container {
   width: 100%;
   max-width: 500px;
@@ -232,70 +209,25 @@ button .fas {
   transition: width 0.6s ease;
 }
 
-/* Adjust spacing between components */
-.container {
-  margin-top: 0;
-}
-
-/* Messages */
-#greeting {
+/* Greeting + Celebration */
+#welcomeMessage {
   font-weight: 500;
   font-size: 18px;
-  padding: 16px 20px;
+  padding: 12px 16px;
   border-radius: 8px;
-  color: #333;
-  margin-bottom: 15px;
-  display: none;
-}
-
-.success-message {
-  background-color: #e8f4fc;
   color: #003c71;
+  margin-bottom: 15px;
+  background-color: #e8f4fc;
 }
 
-/* Counter */
-#attendeeCount {
-  color: #0071c5;
-  font-size: 24px;
-  font-weight: 700;
-  margin: 0 2px;
-}
-
-/* Footer */
-.footer {
-  text-align: center;
-  padding: 40px 20px;
-  color: #94a3b8;
-  font-size: 14px;
-}
-
-.footer-link {
-  color: #64748b;
-  text-decoration: none;
-}
-
-.footer-link:hover {
-  color: #0071c5;
-  text-decoration: underline;
-}
-
-/* Input wrapper for name and team select */
-.input-wrapper {
-  flex: 1;
-  display: flex;
-  gap: 10px;
-}
-
-select {
-  padding: 16px;
-  border: 2px solid rgba(0, 0, 0, 0.08);
-  border-radius: 12px;
-  font-size: 17px;
-  font-weight: 500;
-  background: white;
-  color: #2c3e50;
-  cursor: pointer;
-  min-width: 140px;
+#celebrationMessage {
+  font-weight: 600;
+  font-size: 20px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  color: #fff;
+  background: linear-gradient(135deg, #0071c5, #00c7fd);
 }
 
 /* Team Stats */
@@ -321,11 +253,11 @@ select {
   padding: 15px;
   border-radius: 12px;
   display: flex;
-  flex-direction: column;
-  gap: 5px;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
 }
 
-/* Team card colors */
 .team-card.water {
   background-color: #e8f7fc;
 }
@@ -336,13 +268,51 @@ select {
   background-color: #fff7ed;
 }
 
-.team-name {
-  font-size: 15px;
-  font-weight: 500;
+/* Attendee List */
+.attendee-list {
+  margin-top: 30px;
+  text-align: left;
+}
+
+.attendee-list h3 {
+  font-size: 16px;
+  margin-bottom: 12px;
   color: #475569;
 }
 
-/* Mobile responsive */
+.attendee-list ul {
+  list-style: none;
+}
+
+.attendee-list li {
+  padding: 10px 14px;
+  background: #f8fafc;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  font-size: 15px;
+  color: #334155;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 40px 20px;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.footer-link {
+  color: #64748b;
+  text-decoration: none;
+}
+
+.footer-link:hover {
+  color: #0071c5;
+  text-decoration: underline;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
   .hero {
     padding: 35px 20px;
@@ -354,24 +324,20 @@ select {
     padding: 32px;
     margin: 0 15px 30px;
   }
-
   .form-group {
     flex-direction: column;
   }
-
   input,
-  button {
+  button,
+  select {
     width: 100%;
   }
-
   button {
     height: 50px;
   }
-
   .input-wrapper {
     flex-direction: column;
   }
-
   .teams-grid {
     grid-template-columns: 1fr;
   }

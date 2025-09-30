@@ -5,43 +5,44 @@ const teamSelect = document.getElementById("teamSelect");
 const totalCountDisplay = document.getElementById("totalCount");
 const progressBar = document.getElementById("progressBar");
 const welcomeMessage = document.getElementById("welcomeMessage");
-const celebrationMessage = document.getElementById("celebrationMessage");
 const attendeeList = document.getElementById("attendeeList");
 
 const teamCounters = {
   WaterWise: document.getElementById("WaterWiseCount"),
   NetZero: document.getElementById("NetZeroCount"),
-  Renewables: document.getElementById("RenewablesCount")
+  Renewables: document.getElementById("RenewablesCount"),
 };
 
 const maxCount = 50;
 
-// --- State (load from localStorage) ---
-let count = Number(localStorage.getItem("totalCount")) || 0;
-let teamCounts = JSON.parse(localStorage.getItem("teamCounts")) || {
-  WaterWise: 0,
-  NetZero: 0,
-  Renewables: 0
-};
-let attendees = JSON.parse(localStorage.getItem("attendees")) || [];
+/**
+ * If you want to start fresh each time (count at 0 and empty list),
+ * leave this TRUE. Set to FALSE later if you want to persist between reloads.
+ */
+const RESET_ON_LOAD = true;
 
-// --- Functions ---
-function updateDisplays() {
-  // Total count
-  totalCountDisplay.textContent = count;
+// --- State ---
+let count = 0;
+let teamCounts = { WaterWise: 0, NetZero: 0, Renewables: 0 };
+let attendees = [];
 
-  // Team counts
-  for (const team in teamCounts) {
-    teamCounters[team].textContent = teamCounts[team];
-  }
+// If you later want persistence by default, flip RESET_ON_LOAD to false:
+if (!RESET_ON_LOAD) {
+  count = Number(localStorage.getItem("totalCount")) || 0;
+  teamCounts = JSON.parse(localStorage.getItem("teamCounts")) || teamCounts;
+  attendees = JSON.parse(localStorage.getItem("attendees")) || attendees;
+} else {
+  // Clear any previous stored values so we truly start at 0.
+  localStorage.removeItem("totalCount");
+  localStorage.removeItem("teamCounts");
+  localStorage.removeItem("attendees");
+}
 
-  // Progress bar
-  const percent = Math.min(Math.round((count / maxCount) * 100), 100) + "%";
-  progressBar.style.width = percent;
-  progressBar.textContent = percent;
-
-  // Attendee list
-  renderAttendeeList();
+// --- Helpers ---
+function saveState() {
+  localStorage.setItem("totalCount", count);
+  localStorage.setItem("teamCounts", JSON.stringify(teamCounts));
+  localStorage.setItem("attendees", JSON.stringify(attendees));
 }
 
 function renderAttendeeList() {
@@ -53,58 +54,79 @@ function renderAttendeeList() {
   });
 }
 
-function saveState() {
-  localStorage.setItem("totalCount", count);
-  localStorage.setItem("teamCounts", JSON.stringify(teamCounts));
-  localStorage.setItem("attendees", JSON.stringify(attendees));
+function updateDisplays() {
+  // total + progress
+  totalCountDisplay.textContent = count;
+  const percent = Math.min(Math.round((count / maxCount) * 100), 100);
+  if (progressBar) {
+    progressBar.style.width = percent + "%";
+    progressBar.textContent = percent + "%";
+    progressBar.setAttribute("aria-valuenow", String(count));
+  }
+
+  // team counters
+  for (const t in teamCounts) {
+    if (teamCounters[t]) teamCounters[t].textContent = teamCounts[t];
+  }
+
+  // list
+  renderAttendeeList();
 }
 
-function displayGreeting(name, team) {
-  welcomeMessage.textContent = `🎉 Welcome, ${name} from ${team}!`;
-  setTimeout(() => (welcomeMessage.textContent = ""), 3000);
+function greet(name, teamLabel) {
+  if (!welcomeMessage) return;
+  welcomeMessage.textContent = `🎉 Welcome, ${name} from ${teamLabel}!`;
+  // fade out after 3s
+  setTimeout(() => {
+    welcomeMessage.textContent = "";
+  }, 3000);
 }
 
-function checkCelebration() {
+function celebrateIfGoal() {
+  // optional: add a celebration banner if you have an element for it
+  const celebrationEl = document.getElementById("celebrationMessage");
+  if (!celebrationEl) return;
+
   if (count >= maxCount) {
-    // Find winning team
-    let winningTeam = "";
-    let max = 0;
-    for (const team in teamCounts) {
-      if (teamCounts[team] > max) {
-        max = teamCounts[team];
-        winningTeam = team;
+    let winner = "";
+    let max = -1;
+    for (const t in teamCounts) {
+      if (teamCounts[t] > max) {
+        max = teamCounts[t];
+        winner = t;
       }
     }
-    celebrationMessage.innerHTML = `🏆 Attendance Goal Reached!<br>
-      Congratulations, <strong>${winningTeam}</strong> team!`;
+    celebrationEl.innerHTML = `🏆 Attendance Goal Reached!<br><strong>${winner}</strong> is in the lead!`;
   } else {
-    celebrationMessage.textContent = "";
+    celebrationEl.textContent = "";
   }
 }
 
-// --- Form Handler ---
+// --- Submit handler ---
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   const name = nameInput.value.trim();
   const team = teamSelect.value;
+  const teamLabel = teamSelect.selectedOptions[0]?.text || team;
 
   if (!name || !team) return;
 
-  // Update state
-  count++;
-  teamCounts[team]++;
+  // update state
+  count += 1;
+  if (teamCounts[team] == null) teamCounts[team] = 0; // safety if new team key
+  teamCounts[team] += 1;
   attendees.push({ name, team });
 
-  // Save + Update
+  // persist + UI
   saveState();
   updateDisplays();
-  displayGreeting(name, team);
-  checkCelebration();
+  greet(name, teamLabel);
+  celebrateIfGoal();
 
   form.reset();
+  nameInput.focus();
 });
 
-// --- Init ---
+// --- Initial paint ---
 updateDisplays();
-checkCelebration();
-
+celebrateIfGoal();
